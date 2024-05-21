@@ -1,0 +1,2 @@
+{"evento": "patata", "comprador": {"nombre": "Juancho", "email": "juanq", "celular": "u"}, "como_se_entero": "Redes Sociales", "fase_venta": "Venta Regular", "descuento": 0, "precio_final": 0.0, "cantidad": 2, "fecha_compra": "2024-05-21"}
+{"evento": "Ingrese nombre del show", "comprador": {"nombre": "juanma", "email": "j@", "celular": "2323"}, "como_se_entero": "Redes Sociales", "fase_venta": "Pre-venta", "descuento": 0, "precio_final": 0.0, "cantidad": 10, "fecha_compra": "2024-05-21"}
