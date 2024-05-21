@@ -1,25 +1,21 @@
 import streamlit as st
+from controllers.gui_controller import configurar_pagina, mostrar_imagenes
+from pages.Evento import mostrar_pagina_evento
+from pages.Boleteria import mostrar_pagina_boleteria
+from pages.Dashboard import mostrar_pagina_dashboard
+from pages.Reportes import mostrar_pagina_reportes
 
-st.set_page_config(
-    page_title="Home",
-    page_icon="😂"
-)
+configurar_pagina("Inicio", "🏠")
 
-st.title("Bienvenido al Sistema de Gestión de Eventos de Comedia")
+paginas = {
+    "Inicio": mostrar_pagina_evento,
+    "Boletería": mostrar_pagina_boleteria,
+    "Dashboard": mostrar_pagina_dashboard,
+    "Reportes": mostrar_pagina_reportes,
+}
 
-# Introducción
-st.write("Este sistema está diseñado para gestionar eventos de comedia, permitiendo a los administradores crear, editar y eliminar eventos, gestionar la boletería y generar reportes.")
+st.sidebar.title("Navegación")
+seleccion = st.sidebar.radio("Ir a", list(paginas.keys()))
 
-st.header("Tipos de Eventos")
-st.write("El sistema maneja tres tipos de eventos con características propias:")
-st.markdown("- **Evento en Bar:** Los comediantes son pagados por presentarse.")
-st.markdown("- **Evento en Teatro:** Se alquila el teatro y se retiene un porcentaje de la boletería.")
-st.markdown("- **Evento Filantrópico:** Boletas gratuitas financiadas por patrocinadores.")
-
-st.header("Criterios de Aceptación")
-st.write("El sistema cumple con los siguientes criterios:")
-st.markdown("- Gestión de tres tipos de eventos: Bar, Teatro y Filantrópico.")
-st.markdown("- Definición de detalles del evento, estado y precios de boletas.")
-st.markdown("- Gestión de boletería con verificación de disponibilidad y generación de boletas en PDF.")
-st.markdown("---")
-st.write("© 2024 Juan Canchala y Samuel Troncoso. Todos los derechos reservados.")
+# Mostrar la página seleccionada
+paginas[seleccion]()

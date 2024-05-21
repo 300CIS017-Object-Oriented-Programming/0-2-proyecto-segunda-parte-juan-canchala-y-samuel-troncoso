@@ -7,7 +7,6 @@ from io import BytesIO
 
 st.set_page_config(page_title="Reportes", page_icon="📊")
 
-# Función para cargar datos desde archivos JSON
 def cargar_datos(filename):
     datos = []
     try:
@@ -18,15 +17,12 @@ def cargar_datos(filename):
         st.error(f"No se encontraron datos en {filename}.")
     return datos
 
-# Cargar datos de eventos y boletos
 eventos = cargar_datos('eventos.json')
 boletos = cargar_datos('boletos.json')
 
-# Convertir datos a DataFrames
 df_eventos = pd.DataFrame(eventos)
 df_boletos = pd.DataFrame(boletos)
 
-# Reporte de Ventas de Boletas
 st.header("Reporte de Ventas de Boletas")
 
 if not df_boletos.empty:
@@ -42,7 +38,6 @@ if not df_boletos.empty:
 else:
     st.warning("No hay datos de ventas de boletos disponibles.")
 
-# Reporte Financiero
 st.header("Reporte Financiero")
 
 if not df_boletos.empty:
@@ -57,48 +52,43 @@ if not df_boletos.empty:
 else:
     st.warning("No hay datos financieros disponibles.")
 
-# Reporte de Datos de los Compradores
 st.header("Reporte de Datos de los Compradores")
 
 if not df_boletos.empty:
-    # Normalizar datos de compradores y agregar las columnas necesarias
+
     df_compradores = df_boletos[['comprador', 'cantidad', 'precio_final']].explode('comprador').reset_index(drop=True)
     df_compradores = pd.json_normalize(df_compradores['comprador'])
     df_compradores['cantidad'] = df_boletos.explode('comprador')['cantidad'].values
     df_compradores['precio_final'] = df_boletos.explode('comprador')['precio_final'].values
-    
-    st.subheader("Datos de los Compradores")
-    st.write(df_compradores)
-    
-    # Verificar columnas del DataFrame
-    st.write("Columnas disponibles en df_compradores:", df_compradores.columns)
 
-    # Gráfica de cantidad de boletos por comprador
-    fig1 = px.bar(df_compradores, x='nombre', y='cantidad', title="Cantidad de Boletos por Comprador")
-    st.plotly_chart(fig1)
-    
-    # Gráfica de ingresos por comprador
-    fig2 = px.bar(df_compradores, x='nombre', y='precio_final', title="Ingresos por Comprador")
-    st.plotly_chart(fig2)
-    
-    # Descargar datos en formato Excel
-    def to_excel(df):
-        output = BytesIO()
-        writer = pd.ExcelWriter(output, engine='xlsxwriter')
-        df.to_excel(writer, index=False, sheet_name='Compradores')
-        writer.save()
-        processed_data = output.getvalue()
-        return processed_data
+    if 'nombre' in df_compradores.columns:
+        st.subheader("Datos de los Compradores")
+        st.write(df_compradores)
+        
+        fig1 = px.bar(df_compradores, x='nombre', y='cantidad', title="Cantidad de Boletos por Comprador")
+        st.plotly_chart(fig1)
+        
+        fig2 = px.bar(df_compradores, x='nombre', y='precio_final', title="Ingresos por Comprador")
+        st.plotly_chart(fig2)
+        
+        def to_excel(df):
+            output = BytesIO()
+            writer = pd.ExcelWriter(output, engine='xlsxwriter')
+            df.to_excel(writer, index=False, sheet_name='Compradores')
+            writer.save()
+            processed_data = output.getvalue()
+            return processed_data
 
-    df_xlsx = to_excel(df_compradores)
-    st.download_button(label='📥 Descargar Datos de Compradores',
-                       data=df_xlsx,
-                       file_name='datos_compradores.xlsx',
-                       mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        df_xlsx = to_excel(df_compradores)
+        st.download_button(label='📥 Descargar Datos de Compradores',
+                           data=df_xlsx,
+                           file_name='datos_compradores.xlsx',
+                           mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    else:
+        st.warning("La columna 'nombre' no está presente en los datos de compradores.")
 else:
     st.warning("No hay datos de compradores disponibles.")
 
-# Reporte de Datos por Artista
 st.header("Reporte de Datos por Artista")
 
 if not df_eventos.empty:

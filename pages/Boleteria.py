@@ -5,7 +5,6 @@ from fpdf import FPDF
 
 st.set_page_config(page_title="Boletería", page_icon="🎟️")
 
-# Función para cargar eventos desde el archivo JSON
 def cargar_eventos():
     eventos = []
     try:
@@ -16,13 +15,11 @@ def cargar_eventos():
         st.error("No se encontraron eventos. Por favor, cree algunos eventos primero.")
     return eventos
 
-# Función para guardar la compra de un boleto en un archivo JSON
 def guardar_boleto(boleto):
     with open('boletos.json', 'a') as f:
         json.dump(boleto, f)
         f.write('\n')
 
-# Función para generar un PDF con el recibo de la compra
 def generar_pdf(boleto):
     pdf = FPDF()
     pdf.add_page()
@@ -43,7 +40,6 @@ def generar_pdf(boleto):
     pdf.output(pdf_path)
     return pdf_path
 
-# Función para actualizar ingresos del artista
 def actualizar_ingresos_artista(artista, ingreso):
     try:
         with open('artistas.json', 'r') as f:
@@ -59,19 +55,16 @@ def actualizar_ingresos_artista(artista, ingreso):
     with open('artistas.json', 'w') as f:
         json.dump(artistas, f)
 
-# Cargar eventos
 eventos = cargar_eventos()
 
-# Mostrar eventos disponibles
 st.title("Boletería")
 st.header("Eventos Disponibles")
 
 if eventos:
-    # Crear una lista de nombres de eventos para el selectbox
+
     nombres_eventos = [evento["nombre"] for evento in eventos]
     nombre_evento_seleccionado = st.selectbox("Selecciona un evento", nombres_eventos)
     
-    # Obtener el evento seleccionado
     evento_seleccionado = next((evento for evento in eventos if evento["nombre"] == nombre_evento_seleccionado), None)
 
     if evento_seleccionado:
@@ -91,7 +84,6 @@ if eventos:
         for artista in evento_seleccionado["artistas"]:
             st.text(f" - {artista['nombre_artistico']} ({artista['nombre']})")
 
-        # Formulario para comprar boletos
         st.header("Comprar Boletos")
         nombre_comprador = st.text_input("Nombre del Comprador")
         email_comprador = st.text_input("Email del Comprador")
@@ -102,7 +94,6 @@ if eventos:
         cantidad_boletos = st.number_input("Cantidad de Boletos", min_value=1, step=1)
         codigo_cortesia_ingresado = st.text_input("Código de Cortesía (si aplica)", "")
 
-        # Calcular el precio del boleto según la fase de venta y descuento
         precio = evento_seleccionado['precio_regular'] if fase_venta == "Venta Regular" else evento_seleccionado['precio_preventa']
         if codigo_cortesia_ingresado == evento_seleccionado.get('codigo_cortesia', ''):
             precio_final = 0.0
@@ -115,7 +106,7 @@ if eventos:
         st.text(f"Precio Total: {precio_final * cantidad_boletos:.2f}")
 
         if st.button("Comprar Boletos"):
-            # Verificar disponibilidad de aforo
+
             aforo_total = evento_seleccionado["aforo_total"]
             boletos_vendidos = 0
             try:
@@ -128,7 +119,6 @@ if eventos:
                 boletos_vendidos = 0
 
             if boletos_vendidos + cantidad_boletos <= aforo_total:
-                # Guardar la compra del boleto
                 boleto = {
                     "evento": evento_seleccionado["nombre"],
                     "comprador": {
@@ -153,14 +143,13 @@ if eventos:
                     mime="application/octet-stream"
                 )
 
-                # Calcular y distribuir ingresos según el tipo de evento
                 if evento_seleccionado['tipo'] == 'Bar':
                     ingreso_bar = 0.2 * precio_final * cantidad_boletos
                     ingreso_artista = 0.8 * precio_final * cantidad_boletos
                     st.text(f"Ingreso del Bar: {ingreso_bar:.2f}")
                     st.text(f"Ingreso del Artista: {ingreso_artista:.2f}")
                 elif evento_seleccionado['tipo'] == 'Teatro':
-                    alquiler = evento_seleccionado.get('alquiler', 0)  # Obtener el valor de alquiler si existe, sino 0
+                    alquiler = evento_seleccionado.get('alquiler', 0) 
                     ingreso_tiquetera = 0.07 * precio_final * cantidad_boletos
                     ingreso_artista = 0.93 * precio_final * cantidad_boletos - alquiler
                     st.text(f"Ingreso de la Tiquetera: {ingreso_tiquetera:.2f}")
