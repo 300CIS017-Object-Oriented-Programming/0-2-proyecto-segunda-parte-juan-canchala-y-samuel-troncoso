@@ -1,74 +1,90 @@
 import streamlit as st
-import json
 import pandas as pd
 import plotly.express as px
-from datetime import date, timedelta
+from controllers.event_controller import cargar_datos
 
-st.set_page_config(page_title="Dashboard", page_icon="📊")
+def mostrar_pagina_dashboard():
+    st.header("Dashboard de Gestión de Eventos")
 
-def cargar_datos(filename):
-    datos = []
-    try:
-        with open(filename, 'r') as f:
-            for line in f:
-                datos.append(json.loads(line))
-    except FileNotFoundError:
-        st.error(f"No se encontraron datos en {filename}.")
-    return datos
+    def cargar_eventos():
+        return cargar_datos('eventos.json')
 
-eventos = cargar_datos('eventos.json')
-boletos = cargar_datos('boletos.json')
+    eventos = cargar_eventos()
 
-df_eventos = pd.DataFrame(eventos)
-df_boletos = pd.DataFrame(boletos)
+    df_eventos = pd.DataFrame(eventos)
 
-st.title("Tablero de Control")
-st.header("Filtrar por rango de fechas")
+    if not df_eventos.empty and 'fecha' in df_eventos.columns:
+        df_eventos['fecha'] = pd.to_datetime(df_eventos['fecha'])
 
-start_date = st.date_input("Fecha de inicio", value=date.today() - timedelta(days=30))
-end_date = st.date_input("Fecha de fin", value=date.today())
+        st.subheader("Seleccionar rango de fechas")
+        fecha_inicio = st.date_input("Fecha de inicio", value=pd.to_datetime("2005-01-01").date())
+        fecha_fin = st.date_input("Fecha de fin", value=pd.to_datetime("2024-12-31").date())
 
-df_eventos['fecha'] = pd.to_datetime(df_eventos['fecha'])
-df_eventos_filtrado = df_eventos[(df_eventos['fecha'] >= pd.to_datetime(start_date)) & (df_eventos['fecha'] <= pd.to_datetime(end_date))]
+        fecha_inicio = pd.to_datetime(fecha_inicio)
+        fecha_fin = pd.to_datetime(fecha_fin)
 
-df_boletos['fecha_compra'] = pd.to_datetime(df_boletos['fecha_compra'])
-df_boletos_filtrado = df_boletos[(df_boletos['fecha_compra'] >= pd.to_datetime(start_date)) & (df_boletos['fecha_compra'] <= pd.to_datetime(end_date))]
+        df_eventos_filtrados = df_eventos[(df_eventos['fecha'] >= fecha_inicio) & (df_eventos['fecha'] <= fecha_fin)]
 
-st.subheader("Cantidad de Eventos por Tipo")
-eventos_por_tipo = df_eventos_filtrado['tipo'].value_counts().reset_index()
-eventos_por_tipo.columns = ['tipo', 'cantidad']
-fig1 = px.bar(eventos_por_tipo, x='tipo', y='cantidad', title="Cantidad de Eventos por Tipo")
-st.plotly_chart(fig1)
+        st.subheader("Cantidad de eventos por tipo")
+        if not df_eventos_filtrados.empty:
+            eventos_por_tipo = df_eventos_filtrados['tipo'].value_counts().reset_index()
+            eventos_por_tipo.columns = ['tipo', 'cantidad']
+        else:
+            eventos_por_tipo = pd.DataFrame(columns=['tipo', 'cantidad'])
+        fig1 = px.bar(eventos_por_tipo, x='tipo', y='cantidad', title="Cantidad de Eventos por Tipo")
+        st.plotly_chart(fig1)
 
-st.subheader("Ingresos Totales por Evento")
-ingresos_por_evento = df_boletos_filtrado.groupby('evento')['precio_final'].sum().reset_index()
-fig2 = px.bar(ingresos_por_evento, x='evento', y='precio_final', title="Ingresos Totales por Evento")
-st.plotly_chart(fig2)
+        st.subheader("Ingresos totales por eventos")
+        if not df_eventos_filtrados.empty:
+            if 'precio_regular' in df_eventos_filtrados.columns:
+                df_eventos_filtrados['precio_regular'] = df_eventos_filtrados['precio_regular'].fillna(0)
+                ingresos_por_evento = df_eventos_filtrados.groupby('nombre')['precio_regular'].sum().reset_index()
+                ingresos_por_evento.columns = ['nombre', 'ingresos']
+            else:
+                ingresos_por_evento = pd.DataFrame(columns=['nombre', 'ingresos'])
+        else:
+            ingresos_por_evento = pd.DataFrame(columns=['nombre', 'ingresos'])
+        fig2 = px.bar(ingresos_por_evento, x='nombre', y='ingresos', title="Ingresos Totales por Eventos")
+        st.plotly_chart(fig2)
 
+        ingresos_casa = 0
+        ingresos_artistas = 0
 
-st.subheader("Ingresos Totales por Fecha")
-ingresos_por_fecha = df_boletos_filtrado.groupby('fecha_compra')['precio_final'].sum().reset_index()
-fig3 = px.line(ingresos_por_fecha, x='fecha_compra', y='precio_final', title="Ingresos Totales por Fecha")
-st.plotly_chart(fig3)
+        for evento in df_eventos_filtrados.itertuples():
+            if evento.tipo == 'Bar':
+                ingresos_casa += 0.2 * evento.precio_regular
+                ingresos_artistas += 0.8 * evento.precio_regular
+            elif evento.tipo == 'Teatro':
+                if hasattr(evento, 'alquiler'):
+                    ingresos_casa += 0.07 * evento.precio_regular
+                    ingresos_artistas += (0.93 * evento.precio_regular) - evento.alquiler
+                else:
+                    ingresos_casa += 0.07 * evento.precio_regular
+                    ingresos_artistas += 0.93 * evento.precio_regular
 
-st.header("Gestión de Ingreso al Evento")
+        ingresos = {
+            'Casa': [ingresos_casa],
+            'Artistas': [ingresos_artistas]
+        }
+        df_ingresos = pd.DataFrame(ingresos)
 
-def buscar_boletos(criterio, valor):
-    return df_boletos_filtrado[df_boletos_filtrado[criterio].str.contains(valor, case=False, na=False)]
+        st.subheader("Ingresos Totales")
+        st.write(df_ingresos)
+        fig3 = px.bar(df_ingresos, title="Ingresos Totales para Casa y Artistas")
+        st.plotly_chart(fig3)
 
-criterio_busqueda = st.selectbox("Buscar por", ["comprador.nombre", "evento"])
-valor_busqueda = st.text_input("Valor de búsqueda")
+    else:
+        st.warning("No hay eventos disponibles para mostrar en el dashboard.")
+        st.subheader("Cantidad de eventos por tipo")
+        fig1 = px.bar(pd.DataFrame(columns=['tipo', 'cantidad']), x='tipo', y='cantidad', title="Cantidad de Eventos por Tipo")
+        st.plotly_chart(fig1)
 
-if valor_busqueda:
-    resultados_busqueda = buscar_boletos(criterio_busqueda, valor_busqueda)
-    st.write(resultados_busqueda)
+        st.subheader("Ingresos totales por eventos")
+        fig2 = px.bar(pd.DataFrame(columns=['nombre', 'ingresos']), x='nombre', y='ingresos', title="Ingresos Totales por Eventos")
+        st.plotly_chart(fig2)
 
-    if not resultados_busqueda.empty:
-        boleto_seleccionado = st.selectbox("Selecciona un boleto", resultados_busqueda['evento'])
-        if st.button("Registrar Asistencia"):
-            st.success(f"Asistencia registrada para el boleto: {boleto_seleccionado}")
+        st.subheader("Ingresos Totales")
+        fig3 = px.bar(pd.DataFrame(columns=['Casa', 'Artistas']), title="Ingresos Totales para Casa y Artistas")
+        st.plotly_chart(fig3)
 
-st.subheader("Cantidad de Boletos Vendidos por Evento")
-boletos_vendidos_por_evento = df_boletos_filtrado.groupby('evento')['cantidad'].sum().reset_index()
-fig4 = px.bar(boletos_vendidos_por_evento, x='evento', y='cantidad', title="Cantidad de Boletos Vendidos por Evento")
-st.plotly_chart(fig4)
+mostrar_pagina_dashboard()

@@ -1,4 +1,3 @@
-# models/EventoBar.py
 class EventoBar:
     def __init__(self, artista, nombre, fecha, hora_apertura, hora_show, lugar_show, direccion, ciudad, estado, precioVentaRegular, precioPreVenta, estado_boleteria, aforoTotal, num_presentaciones, codigo_cortesia):
         self.artista = artista

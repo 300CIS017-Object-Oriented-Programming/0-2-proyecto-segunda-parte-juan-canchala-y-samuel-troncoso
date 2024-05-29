@@ -1,4 +1,3 @@
-# models/EventoFilantropico.py
 class EventoFilantropico:
     def __init__(self, artista, nombre, fecha, hora_apertura, hora_show, lugar_show, direccion, ciudad, estado, precioVentaRegular, precioPreVenta, estado_boleteria, aforoTotal, patrocinadores, codigo_cortesia):
         self.artista = artista
@@ -18,4 +17,4 @@ class EventoFilantropico:
         self.codigo_cortesia = codigo_cortesia
 
     def calcular_ingresos(self):
-        pass  # No hay ingresos de boletos en eventos filantrópicos
+        pass  

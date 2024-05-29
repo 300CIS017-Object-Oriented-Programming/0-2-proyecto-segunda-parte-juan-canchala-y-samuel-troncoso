@@ -1,5 +1,7 @@
+import os
+import sys
 import subprocess
 
-comando = ["streamlit", "run", "view/main_view.py"]
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-subprocess.Popen(comando, shell=True)
+subprocess.run(["streamlit", "run", "view/main_view.py"])

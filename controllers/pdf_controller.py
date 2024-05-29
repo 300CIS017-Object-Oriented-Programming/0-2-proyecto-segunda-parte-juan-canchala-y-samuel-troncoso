@@ -4,11 +4,12 @@ def generar_pdf(evento, tipo_evento):
     pdf = FPDF()
     pdf.add_page()
     
-    # Título
+    logo_path = "static/img/logo.png"
+    pdf.image(logo_path, x=10, y=8, w=30)
+    
     pdf.set_font("Arial", size=12)
     pdf.cell(200, 10, txt=f"Ticket de Evento - {tipo_evento}", ln=True, align='C')
     
-    # Información del evento
     pdf.ln(10)
     pdf.cell(200, 10, txt=f"Nombre del Evento: {evento.nombre}", ln=True)
     pdf.cell(200, 10, txt=f"Fecha: {evento.fecha}", ln=True)
