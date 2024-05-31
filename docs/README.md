@@ -262,35 +262,44 @@ sequenceDiagram
 
 ## Eventos
 1. Se deben manejar 3 tipos de eventos en el sistema: evento en Bar, evento en Teatro y evento Filantrópico (boletería sin costo).
-![Texto alternativo](ruta/a/la/imagen.jpg)
+![Texto alternativo](static/img/1evento.png)
 2. El sistema permite ingresar detalles del evento como artista o artistas del show, nombre, fecha, hora de apertura de puertas, hora del show, lugar, dirección y ciudad.
-![Texto alternativo](ruta/a/la/imagen.jpg)
+![Texto alternativo](static/img/2evento.png)
 3. El sistema permite definir el estado del evento (realizado, por realizar, cancelado, aplazado, cerrado). Cambios en el estado "realizado" están restringidos.
-![Texto alternativo](ruta/a/la/imagen.jpg)
+![Texto alternativo](static/img/3evento.png)
 4. El administrador puede definir precios de boletas para diferentes categorías y fases de venta (preventa y venta regular).
-![Texto alternativo](ruta/a/la/imagen.jpg)
+![Texto alternativo](static/img/4evento.png)
 5. Se impide la eliminación de eventos con boletería vendida.
-![Texto alternativo](ruta/a/la/imagen.jpg)
+![Texto alternativo](static/img/5evento.png)
 6. El sistema permite definir el aforo total del evento.
-![Texto alternativo](ruta/a/la/imagen.jpg)
+![Texto alternativo](static/img/6evento.png)
 7. Ingreso al evento
 
 ## Boleteria
 
 1. Se requieren datos del comprador y cómo se enteró del evento al vender una boleta.
+![Texto alternativo](static/img/1boleteria.png)
 2. El sistema verifica la disponibilidad de aforo antes de completar la venta.
+![Texto alternativo](static/img/2boleteria.png)
 3. El precio de la boleta varía según la fase de venta y aplicaciones de descuentos.
-4. Las boletas de cortesía se pueden emitir con un precio de cero.
+![Texto alternativo](static/img/3boleteria.png)
 5. Generación de PDF con la boleta.
+![Texto alternativo](static/img/4boleteria.png)
 
 ## Reportes
 
 1. Reporte de Ventas de Boletas: Detalla cantidad de boletas vendidas por tipo (incluyendo cortesías) y los ingresos totales por preventa y venta regular.
+![Texto alternativo](static/img/1reportes.png)
 2. Reporte Financiero: Desglosa los ingresos por tipo de pago y tipo de boletería.
+![Texto alternativo](static/img/2reportes.png)
 3. Reporte de Datos de los Compradores: Ofrece información detallada de los compradores permitiendo análisis demográficos y de comportamiento para estrategias de marketing. Debe incluir al menos dos gráficas visualizando esta información (en Plotly) y estar disponible para descargar en formato Excel.
+![Texto alternativo](static/img/3reportes.png)
 4. Reporte de Datos por Artista: Dado un artista (que se puede filtrar desde la interfaz gráfica) será posible reportar datos generales de sus eventos gestionados en el sistema. En los datos generales de cada evento deben estar cosas como (nombre del evento, fecha, lugar, cantidad de boletas vendidas, porcentaje de aforo cubierto).
+![Texto alternativo](static/img/4reportes.png)
 
 ## Dashboard
 
 1. Dashboard con su rango de fechas.
+![Texto alternativo](static/img/1dashboard.png)
 2. Graficos
+![Texto alternativo](ruta/a/la/2dashboard.jpg)
