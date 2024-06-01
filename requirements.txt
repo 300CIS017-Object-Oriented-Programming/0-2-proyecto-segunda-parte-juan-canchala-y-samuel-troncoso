@@ -5,4 +5,4 @@ plotly
 pandas 
 openpyxl 
 xlsxwriter
-pdfp
+fpdf
