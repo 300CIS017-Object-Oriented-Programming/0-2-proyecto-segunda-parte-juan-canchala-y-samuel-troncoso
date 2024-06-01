@@ -1,0 +1,30 @@
+/* styles.css */
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.header {
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.custom-button {
+    background-color: #ffffff;
+    color: white;
+    border: none;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.custom-button:hover {
+    background-color: #45a049;
+}
